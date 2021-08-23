@@ -38,15 +38,24 @@ const pool = mysql.createPool({
   connectionLimit: 20,
   host: process.env.ISUBATA_DB_HOST || 'localhost',
   port: process.env.ISUBATA_DB_PORT || '3306',
-  user: process.env.ISUBATA_DB_USER || 'root',
-  password: process.env.ISUBATA_DB_PASSWORD || '',
+  user: process.env.ISUBATA_DB_USER || 'isucon',
+  password: process.env.ISUBATA_DB_PASSWORD || 'isucon',
   database: 'isubata',
   charset: 'utf8mb4',
 })
 pool.query = promisify(pool.query, pool)
 
+pool.query('SELECT * from image', (err,rows,fields) => {
+  if (err) throw err;
+  rows.forEach((value) => {
+  fs.writeFileSync(`${ICONS_FOLDER}/${value.name}`, value.data)
+})
+})
+
+
 app.get('/initialize', getInitialize)
 function getInitialize(req, res) {
+  
   return pool.query('DELETE FROM user WHERE id > 1000')
     .then(() => pool.query('DELETE FROM image WHERE id > 1001'))
     .then(() => pool.query('DELETE FROM channel WHERE id > 10'))
@@ -472,6 +481,7 @@ function getIcon(req, res) {
         res.status(404).end()
         return
       }
+      console.log("return icon")
       res.header({ 'Content-Type': mime }).end(row.data)
     })
 }
