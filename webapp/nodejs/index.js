@@ -442,12 +442,6 @@ function postProfile(req, res) {
           avatarData = data
         }
       }
-      pool.query('SELECT * from image', (err,rows,fields) => {
-        if (err) throw err;
-        rows.forEach((value) => {
-        fs.writeFileSync(`${ICONS_FOLDER}/${value.name}`, value.data)
-      })
-      })
       
       if (avatarName && avatarData) {
         fs.writeFileSync(`${ICONS_FOLDER}/${avatarName}`, avatarData)
