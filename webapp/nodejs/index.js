@@ -442,9 +442,15 @@ function postProfile(req, res) {
           avatarData = data
         }
       }
+      pool.query('SELECT * from image', (err,rows,fields) => {
+        if (err) throw err;
+        rows.forEach((value) => {
+        fs.writeFileSync(`${ICONS_FOLDER}/${value.name}`, value.data)
+      })
+      })
+      
       if (avatarName && avatarData) {
-        // fs.writeFile(`/home/isucon/icons/${avatarName}`,avatarData)
-        p = p.then(() => pool.query('INSERT INTO image (name, data) VALUES (?, _binary ?)', [avatarName, avatarData]))
+        fs.writeFileSync(`${ICONS_FOLDER}/${avatarName}`, avatarData)
         p = p.then(() => pool.query('UPDATE user SET avatar_icon = ? WHERE id = ?', [avatarName, userId]))
       }
 
